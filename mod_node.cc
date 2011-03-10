@@ -88,8 +88,8 @@ class ApacheProcess : public node::EventEmitter {
 		NODE_SET_PROTOTYPE_METHOD(t, "log", Log);
 		NODE_SET_PROTOTYPE_METHOD(t, "warn", Warn);
 		NODE_SET_PROTOTYPE_METHOD(t, "critical", Crit);
-		Process = Persistent<Object>::New(t->GetFunction()->NewInstance());
 		NODE_SET_PROTOTYPE_METHOD(t, "write", Write); // HACK!
+		Process = Persistent<Object>::New(t->GetFunction()->NewInstance());
 		target->Set(String::New("process"), Process);
 	}
 
@@ -101,8 +101,8 @@ class ApacheProcess : public node::EventEmitter {
 	protected:
 	ApacheProcess() : EventEmitter() {
 		process = mod_node::process;
-		req_watcher.data = this;
 		ev_async_init(EV_DEFAULT_ &req_watcher, ApacheProcess::RequestCallback);
+		req_watcher.data = this;
 		ev_async_start(EV_DEFAULT_ &req_watcher);
 		ev_ref(EV_DEFAULT);
 	}
@@ -118,23 +118,24 @@ class ApacheProcess : public node::EventEmitter {
 		assert(p);
 
 		apr_thread_mutex_lock(mtx);
+		ev_async_send(EV_DEFAULT_ &(p->req_watcher));
 		{
 			v8::Unlocker unlock;
-			ev_async_send(EV_DEFAULT_ &(p->req_watcher));
 			while(!cont_request) {
 				apr_thread_cond_wait(cv, mtx);
 			}
 		}
+		apr_thread_mutex_unlock(mtx);
 
 		return rc;
 	}
 
 
 	static void RequestCallback(EV_P_ ev_async *w, int revents) {
+		// Executes in Node's thread
 		v8::Locker l;
-		ApacheProcess *p = static_cast<ApacheProcess*>(w->data);
-		assert(p);
 		HandleScope scope;
+		ApacheProcess *p = static_cast<ApacheProcess*>(w->data);
 		p->Emit(connection_symbol, 0, NULL); // FIXME: pass Request here
 	};
 
@@ -152,7 +153,9 @@ class ApacheProcess : public node::EventEmitter {
 		ap_rputs(*value, r);
 
 		cont_request = 1;
+		apr_thread_mutex_lock(mtx);
 		apr_thread_cond_signal(cv);
+		apr_thread_mutex_unlock(mtx);
 
 		return Undefined();
 	}
