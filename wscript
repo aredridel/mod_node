@@ -13,8 +13,8 @@ def configure(conf):
   conf.check_tool('node_addon')
   conf.check_cfg(path='apr-1-config', args='--includes', package='', uselib_store='APR')
   conf.check_cfg(path='apu-1-config', args='--includes', package='', uselib_store='APU')
-  conf.env.CPPPATH_HTTPD = [subprocess.check_output(['apxs', '-q', 'INCLUDEDIR']).strip()]
-#  conf.env.CXXFLAGS = subprocess.check_output(['apxs', '-q', 'CFLAGS']).strip().split(' ')
+  conf.env.CPPPATH_HTTPD = [subprocess.Popen(['apxs', '-q', 'INCLUDEDIR'], stdout=subprocess.PIPE).communicate()[0].strip()]
+#  conf.env.CXXFLAGS = subprocess.Popen(['apxs', '-q', 'CFLAGS'], stdout=subprocess.PIPE).communicate()[0].strip().split(' ')
   conf.check(header_name='httpd.h', compile_mode='cc', uselib=['HTTPD', 'APR', 'APU'], mandatory=True)
   conf.check(lib='node')
   conf.check(lib='v8')
