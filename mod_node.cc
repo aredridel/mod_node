@@ -76,6 +76,7 @@ class ApacheProcess : public node::EventEmitter {
 
 	static void Initialize(Handle<Object> target) {
 		HandleScope scope;
+		v8::Locker l;
 		Local<FunctionTemplate> t = FunctionTemplate::New(New);
 		t->Inherit(EventEmitter::constructor_template);
 		t->InstanceTemplate()->SetInternalFieldCount(2); // 1 + ungodly HACK
@@ -105,6 +106,10 @@ class ApacheProcess : public node::EventEmitter {
 		req_watcher.data = this;
 		ev_async_start(EV_DEFAULT_ &req_watcher);
 		ev_ref(EV_DEFAULT);
+	}
+
+	~ApacheProcess() {
+		ev_unref(EV_DEFAULT);
 	}
 
 	static int hook_handler(request_rec *r) {
