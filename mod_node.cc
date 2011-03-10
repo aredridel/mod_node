@@ -166,6 +166,7 @@ class ApacheProcess : public node::EventEmitter {
 	}
 
 	static Handle<Value> New(const Arguments &args) {
+		v8::Locker l;
 		HandleScope scope;
 
 		ApacheProcess *p = new ApacheProcess();
