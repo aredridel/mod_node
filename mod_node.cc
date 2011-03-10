@@ -189,6 +189,7 @@ class ApacheProcess : public node::EventEmitter {
 	}
 
 	static Handle<Value> DoLog(int level, const Arguments &args) {
+		v8::Locker l;
 		ApacheProcess *p = ObjectWrap::Unwrap<ApacheProcess>(args.This());
 		assert(p);
 		if (args.Length() < 1 || !args[0]->IsString()) {
