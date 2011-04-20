@@ -1,0 +1,267 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		59C167D7132895EB0089F4CE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 597563B6132892CC007619C1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 59C167D3132895D30089F4CE;
+			remoteInfo = "mod_node configure";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		59C167C8132893D70089F4CE /* apache.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = apache.cc; sourceTree = "<group>"; };
+		59C167CA132893D70089F4CE /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		59C167CC132893D70089F4CE /* mod_node.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mod_node.cc; sourceTree = "<group>"; };
+		59C167CD132893D70089F4CE /* mod_node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mod_node.h; sourceTree = "<group>"; };
+		59C167CF132893D70089F4CE /* runtime.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = runtime.js; sourceTree = "<group>"; };
+		59C167D0132893D70089F4CE /* TODO */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
+		59C167D1132893D70089F4CE /* wscript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = wscript; sourceTree = "<group>"; };
+		59C167D2132893D70089F4CE /* example.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = example.conf; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		597563B4132892CC007619C1 = {
+			isa = PBXGroup;
+			children = (
+				59C167C7132893D70089F4CE /* mod_node */,
+			);
+			sourceTree = "<group>";
+		};
+		59C167C7132893D70089F4CE /* mod_node */ = {
+			isa = PBXGroup;
+			children = (
+				59C167C8132893D70089F4CE /* apache.cc */,
+				59C167C9132893D70089F4CE /* conf */,
+				59C167CA132893D70089F4CE /* LICENSE */,
+				59C167CB132893D70089F4CE /* logs */,
+				59C167CC132893D70089F4CE /* mod_node.cc */,
+				59C167CD132893D70089F4CE /* mod_node.h */,
+				59C167CE132893D70089F4CE /* public */,
+				59C167CF132893D70089F4CE /* runtime.js */,
+				59C167D0132893D70089F4CE /* TODO */,
+				59C167D1132893D70089F4CE /* wscript */,
+			);
+			name = mod_node;
+			sourceTree = "<group>";
+		};
+		59C167C9132893D70089F4CE /* conf */ = {
+			isa = PBXGroup;
+			children = (
+				59C167D2132893D70089F4CE /* example.conf */,
+			);
+			path = conf;
+			sourceTree = "<group>";
+		};
+		59C167CB132893D70089F4CE /* logs */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = logs;
+			sourceTree = "<group>";
+		};
+		59C167CE132893D70089F4CE /* public */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = public;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		597563BB132892CC007619C1 /* mod_node */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "-s $(PROJECT_DIR) $(ACTION)";
+			buildConfigurationList = 597563BE132892CC007619C1 /* Build configuration list for PBXLegacyTarget "mod_node" */;
+			buildPhases = (
+			);
+			buildToolPath = "/usr/local/bin/node-waf";
+			buildWorkingDirectory = "";
+			dependencies = (
+				59C167D8132895EB0089F4CE /* PBXTargetDependency */,
+			);
+			name = mod_node;
+			passBuildSettingsInEnvironment = 1;
+			productName = mod_node;
+		};
+		59C167D3132895D30089F4CE /* mod_node configure */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 59C167D4132895D30089F4CE /* Build configuration list for PBXLegacyTarget "mod_node configure" */;
+			buildPhases = (
+			);
+			buildToolPath = "/usr/local/bin/node-waf";
+			buildWorkingDirectory = "";
+			dependencies = (
+			);
+			name = "mod_node configure";
+			passBuildSettingsInEnvironment = 1;
+			productName = "mod_node configure";
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		597563B6132892CC007619C1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = "The Internet Company";
+			};
+			buildConfigurationList = 597563B9132892CC007619C1 /* Build configuration list for PBXProject "mod_node" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 597563B4132892CC007619C1;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				597563BB132892CC007619C1 /* mod_node */,
+				59C167D3132895D30089F4CE /* mod_node configure */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXTargetDependency section */
+		59C167D8132895EB0089F4CE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 59C167D3132895D30089F4CE /* mod_node configure */;
+			targetProxy = 59C167D7132895EB0089F4CE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		597563BC132892CC007619C1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		597563BD132892CC007619C1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		597563BF132892CC007619C1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		597563C0132892CC007619C1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		59C167D5132895D30089F4CE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ACTION = configure;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		59C167D6132895D30089F4CE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ACTION = configure;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		597563B9132892CC007619C1 /* Build configuration list for PBXProject "mod_node" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				597563BC132892CC007619C1 /* Debug */,
+				597563BD132892CC007619C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		597563BE132892CC007619C1 /* Build configuration list for PBXLegacyTarget "mod_node" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				597563BF132892CC007619C1 /* Debug */,
+				597563C0132892CC007619C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		59C167D4132895D30089F4CE /* Build configuration list for PBXLegacyTarget "mod_node configure" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				59C167D5132895D30089F4CE /* Debug */,
+				59C167D6132895D30089F4CE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 597563B6132892CC007619C1 /* Project object */;
+}
