@@ -7,7 +7,6 @@ apache.process.warn("warn");
 apache.process.log("info");
 
 apache.process.on("connection", function(req) {
-	console.debug("Ow!");
 	apache.process.warn("Got a connection")
 	apache.process.write("Hi mom!");
 })
