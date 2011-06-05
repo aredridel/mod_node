@@ -200,6 +200,7 @@ class ApacheServer : public node::EventEmitter {
 	public:
 	static void Initialize(Handle<Object> target) {
 		HandleScope scope;
+		v8::Locker l;
 		Local<FunctionTemplate> t = FunctionTemplate::New(New);
 		t->Inherit(EventEmitter::constructor_template);
 		// FIXME: Connect up the apache request to emitting a Request here
@@ -221,6 +222,7 @@ class ApacheServer : public node::EventEmitter {
 class ApacheRequest : public node::EventEmitter {
 	public:
 	static void Initialize(Handle<Object> target) {
+		v8::Locker l;
 		HandleScope scope;
 		Local<FunctionTemplate> t = FunctionTemplate::New(New);
 		t->Inherit(EventEmitter::constructor_template);
@@ -231,6 +233,7 @@ class ApacheRequest : public node::EventEmitter {
 
 	protected:
 	static Handle<Value> New(const Arguments &args) {
+		v8::Locker l;
 		HandleScope scope;
 
 		ApacheRequest *s = new ApacheRequest();
@@ -241,6 +244,7 @@ class ApacheRequest : public node::EventEmitter {
 
 
 	static Handle<Value> Write(const Arguments &args) {
+		v8::Locker l;
 		ApacheRequest *req = ObjectWrap::Unwrap<ApacheRequest>(args.This());
 		request_rec *r;
 		HandleScope scope;
