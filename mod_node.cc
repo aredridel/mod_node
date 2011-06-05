@@ -298,6 +298,7 @@ static void *start_node(apr_thread_t *th, void* data) {
 	strcpy(argv[0], "node");
 	argv[1] = strdup(conf->startup_script);
 	ap_log_error(APLOG_MARK, APLOG_ERR, 0, s, "mod_node::startup script: %s", argv[1]);
+	// FIXME: error handling if the runtime script throws an exception
 	node::Start(2, argv);
 	return APR_SUCCESS;
 }
