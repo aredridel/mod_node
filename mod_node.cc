@@ -27,7 +27,6 @@ typedef struct {
 static const char * node_cmd_startup_script(cmd_parms *cmd, void *dcfg, const char *arg);
 static void node_hook_child_init(apr_pool_t *p, server_rec *s);
 static void *start_node(apr_thread_t *th, void *data);
-static void setup_node(v8::Local<v8::Object> global);
 
 static Persistent<String> log_symbol;
 static Persistent<String> warn_symbol;
