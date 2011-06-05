@@ -53,13 +53,6 @@ static void node_hook_child_init(apr_pool_t *p, server_rec *s) {
 	apr_thread_create(&mod_node::thread, NULL, start_node, (void *)s, s->process->pool);
 };
 
-void setup_node(v8::Local<v8::Object> global) {
-	Local<FunctionTemplate> apache_template = FunctionTemplate::New();
-	node::EventEmitter::Initialize(apache_template);
-	Local <Value> apache = apache_template->GetFunction()->NewInstance();
-	global->Set(v8::String::NewSymbol("Apache"), apache);
-}
-
 namespace mod_node {
 
 	static Persistent<Object> Process;
