@@ -7,6 +7,8 @@
 #include <apr_thread_cond.h>
 #include <apr_queue.h>
 
+#include <mod_proxy.h>
+
 #undef EV_MULTIPLICITY
 
 #include <v8.h>
@@ -33,6 +35,7 @@ static Persistent<String> warn_symbol;
 static Persistent<String> crit_symbol;
 static Persistent<String> write_symbol;
 static Persistent<String> connection_symbol;
+static Persistent<String> proxies_symbol;
 
 static void *create_node_module_config(apr_pool_t *p, server_rec *s) {
 	node_module_config *conf;
@@ -54,10 +57,76 @@ static void node_hook_child_init(apr_pool_t *p, server_rec *s) {
 
 namespace mod_node {
 
+	typedef struct {
+		int cont_request;
+		apr_thread_cond_t *cv;
+		apr_thread_mutex_t *mtx;
+	} request_ext;
+
 	static Persistent<Object> Process;
-	static apr_thread_cond_t *cv;
-	static int cont_request = 0;
-	static apr_thread_mutex_t *mtx;
+
+class ApacheRequest : public node::EventEmitter {
+	public:
+	static void Initialize(Handle<Object> target) {
+		v8::Locker l;
+		HandleScope scope;
+		Local<FunctionTemplate> t = FunctionTemplate::New();
+		t->Inherit(EventEmitter::constructor_template);
+		NODE_SET_PROTOTYPE_METHOD(t, "write", Write);
+
+		target->Set(String::New("Request"), t->GetFunction());
+	}
+
+	request_rec *r;
+
+	static Handle<Value> New(const Arguments &args) {
+		if (!args.IsConstructCall()) {
+			return FromConstructorTemplate(constructor_template, args);
+		}
+
+		    HandleScope scope;
+
+		      if (args.Length() != 1 || !args[0]->IsInt32()) {
+			          return ThrowException(String::New("Bad arguments"));
+				    }
+
+		        int sig = args[0]->Int32Value();
+
+			  SignalWatcher *w = new SignalWatcher(sig);
+			    w->Wrap(args.Holder());
+
+			      return args.This();
+		v8::Locker l;
+		HandleScope scope;
+
+		ApacheRequest *s = new ApacheRequest();
+		s->Wrap(args.This());
+
+		return args.This();
+	};
+
+	protected:
+
+	static Handle<Value> Write(const Arguments &args) {
+		v8::Locker l;
+		ApacheRequest *req = ObjectWrap::Unwrap<ApacheRequest>(args.This());
+		request_rec *r;
+		HandleScope scope;
+		if (args.Length() == 0 || !args[0]->IsString()) {
+			return ThrowException(Exception::TypeError(
+				String::New("First argument must be a string"))
+			);
+		}
+
+		String::Utf8Value str(args[0]->ToString());
+
+		ap_rputs(*str, r);
+
+
+		return Undefined();
+	}
+};
+
 
 class ApacheProcess : public node::EventEmitter {
 	public:
@@ -77,6 +146,7 @@ class ApacheProcess : public node::EventEmitter {
 		warn_symbol = NODE_PSYMBOL("warn");
 		crit_symbol = NODE_PSYMBOL("critical");
 		write_symbol = NODE_PSYMBOL("write");
+		proxies_symbol = NODE_PSYMBOL("proxies");
 		connection_symbol = NODE_PSYMBOL("connection");
 		NODE_SET_PROTOTYPE_METHOD(t, "log", Log);
 		NODE_SET_PROTOTYPE_METHOD(t, "warn", Warn);
@@ -88,12 +158,14 @@ class ApacheProcess : public node::EventEmitter {
 
 	static void register_hooks(apr_pool_t *p) {
 		ap_hook_child_init (node_hook_child_init, NULL,NULL, APR_HOOK_MIDDLE);
-		ap_hook_handler(ApacheProcess::hook_handler, NULL, NULL, APR_HOOK_MIDDLE);
+		ap_hook_handler(ApacheProcess::handler, NULL, NULL, APR_HOOK_MIDDLE);
 	};
 
 	protected:
 	ApacheProcess() : EventEmitter() {
 		process = mod_node::process;
+
+		apr_queue_create(&queue, 100, process->pool); // FIXME: handle error
 		ev_async_init(EV_DEFAULT_ &req_watcher, ApacheProcess::RequestCallback);
 		req_watcher.data = this;
 		ev_async_start(EV_DEFAULT_ &req_watcher);
@@ -104,25 +176,31 @@ class ApacheProcess : public node::EventEmitter {
 		ev_unref(EV_DEFAULT);
 	}
 
-	static int hook_handler(request_rec *r) {
+	static int handler(request_rec *r) {
 		// Runs in the Apache thread
 		apr_status_t rv;
+		request_ext rex;
+		rex.cont_request = 0;
 		int rc = OK;
 		v8::Locker l;
 		HandleScope scope;
-		Process->SetInternalField(1, External::New(r)); // ungodly HACK
 		ApacheProcess *p = ObjectWrap::Unwrap<ApacheProcess>(Process);
+		Handle<ApacheRequest> req = ApacheRequest::New(r);
 		assert(p);
+		apr_thread_cond_create(&rex.cv, p->process->pool);
+		apr_thread_mutex_create(&rex.mtx, APR_THREAD_MUTEX_DEFAULT,  p->process->pool);
 
-		apr_thread_mutex_lock(mtx);
+		apr_thread_mutex_lock(rex.mtx);
+		apr_table_setn(r->notes, "mod_node", (char *)&rex);
+		apr_queue_push(p->queue, &req); // FIXME: Errors
 		ev_async_send(EV_DEFAULT_ &(p->req_watcher));
 		{
 			v8::Unlocker unlock;
-			while(!cont_request) {
-				apr_thread_cond_wait(cv, mtx);
+			while(!rex.cont_request) {
+				apr_thread_cond_wait(rex.cv, rex.mtx);
 			}
 		}
-		apr_thread_mutex_unlock(mtx);
+		apr_thread_mutex_unlock(rex.mtx);
 
 		return rc;
 	}
@@ -133,7 +211,9 @@ class ApacheProcess : public node::EventEmitter {
 		v8::Locker l;
 		HandleScope scope;
 		ApacheProcess *p = static_cast<ApacheProcess*>(w->data);
-		p->Emit(connection_symbol, 0, NULL); // FIXME: pass Request here
+		Handle<ApacheRequest> *r;
+		apr_queue_pop(p->queue, (void**)r); // FIXME: Errors
+		p->Emit(connection_symbol, 0, r);
 	};
 
 	static Handle<Value> Write(const Arguments& args) {
@@ -146,13 +226,15 @@ class ApacheProcess : public node::EventEmitter {
 		Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
 
 		request_rec *r = static_cast<request_rec*>(wrap->Value());
+		request_ext *rex;
+		apr_table_get(r->notes, "mod_node"); // FIXME: Errors
 
 		ap_rputs(*value, r);
 
-		cont_request = 1;
-		apr_thread_mutex_lock(mtx);
-		apr_thread_cond_signal(cv);
-		apr_thread_mutex_unlock(mtx);
+		rex->cont_request = 1;
+		apr_thread_mutex_lock(rex->mtx);
+		apr_thread_cond_signal(rex->cv);
+		apr_thread_mutex_unlock(rex->mtx);
 
 		return Undefined();
 	}
@@ -163,8 +245,6 @@ class ApacheProcess : public node::EventEmitter {
 
 		ApacheProcess *p = new ApacheProcess();
 		p->Wrap(args.This());
-		apr_thread_cond_create(&cv, p->process->pool);
-		apr_thread_mutex_create(&mtx, APR_THREAD_MUTEX_DEFAULT,  p->process->pool);
 
 		return args.This();
 	};
@@ -218,50 +298,6 @@ class ApacheServer : public node::EventEmitter {
 
 };
 
-class ApacheRequest : public node::EventEmitter {
-	public:
-	static void Initialize(Handle<Object> target) {
-		v8::Locker l;
-		HandleScope scope;
-		Local<FunctionTemplate> t = FunctionTemplate::New(New);
-		t->Inherit(EventEmitter::constructor_template);
-		NODE_SET_PROTOTYPE_METHOD(t, "write", Write);
-
-		target->Set(String::New("Request"), t->GetFunction());
-	}
-
-	protected:
-	static Handle<Value> New(const Arguments &args) {
-		v8::Locker l;
-		HandleScope scope;
-
-		ApacheRequest *s = new ApacheRequest();
-		s->Wrap(args.This());
-
-		return args.This();
-	};
-
-
-	static Handle<Value> Write(const Arguments &args) {
-		v8::Locker l;
-		ApacheRequest *req = ObjectWrap::Unwrap<ApacheRequest>(args.This());
-		request_rec *r;
-		HandleScope scope;
-		if (args.Length() == 0 || !args[0]->IsString()) {
-			return ThrowException(Exception::TypeError(
-				String::New("First argument must be a string"))
-			);
-		}
-
-		String::Utf8Value str(args[0]->ToString());
-
-		ap_rputs(*str, r);
-
-
-		return Undefined();
-	}
-};
-
 	extern void Initialize(v8::Handle<v8::Object> target) {
 		ApacheProcess::Initialize(target);
 	};
@@ -295,6 +331,7 @@ static void *start_node(apr_thread_t *th, void* data) {
 	argv[1] = strdup(conf->startup_script);
 	ap_log_error(APLOG_MARK, APLOG_ERR, 0, s, "mod_node::startup script: %s", argv[1]);
 	// FIXME: error handling if the runtime script throws an exception
+	// Probably atexit(3) and log an error and clean up, return a 500 error.
 	node::Start(2, argv);
 	return APR_SUCCESS;
 }
