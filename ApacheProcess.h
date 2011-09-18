@@ -9,7 +9,6 @@
 #include <apr_queue.h>
 
 #include <httpd.h>
-#include <apr_thread_proc.h>
 
 #include "mod_node.h"
 
