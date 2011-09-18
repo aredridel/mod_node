@@ -30,15 +30,15 @@ def configure(conf):
   conf.check(lib='v8')
 
 def build(bld):
-  node_apache = bld.new_task_gen('cxx', 'cshlib', 'node_addon')
-  node_apache.target = 'apache'
-  node_apache.source = 'apache.cc'
-  node_apache.uselib = ['HTTPD', 'APU', 'APR']
-  if bld.env.USE_UNDEFINED_DYNAMIC:
-    node_apache.linkflags = ['-Wl,-undefined', '-Wl,dynamic_lookup']
-  mod_node = bld.new_task_gen('cxx', 'cshlib')
-  mod_node.target = 'mod_node'
-  mod_node.source = 'mod_node.cc'
-  mod_node.uselib = ['HTTPD', 'APU', 'APR', 'NODE']
-  if bld.env.USE_UNDEFINED_DYNAMIC:
-    mod_node.env.append_value('LINKFLAGS', ['-undefined', 'dynamic_lookup'])
+  bld.new_task_gen(
+    source = 'apache.cc',
+    target = 'apache',
+    features = 'cshlib cxx node_addon',
+    uselib = ['HTTPD', 'APU', 'APR'], 
+    linkflags = ['-Wl,-undefined', '-Wl,dynamic_lookup'] if bld.env.USE_UNDEFINED_DYNAMIC else [])
+  bld.new_task_gen(
+    source = 'mod_node.cc ApacheProcess.cc',
+    target = 'mod_node',
+    features = ['cxx', 'cshlib'],
+    uselib = ['HTTPD', 'APU', 'APR', 'NODE'],
+    linkflags = ['-Wl,-undefined', '-Wl,dynamic_lookup'] if bld.env.USE_UNDEFINED_DYNAMIC else [])
