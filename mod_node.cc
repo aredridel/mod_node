@@ -43,9 +43,6 @@ static const command_rec node_config_cmds[] = {
 
 namespace mod_node {
 
-
-    static Persistent<FunctionTemplate> req_function_template;
-
     class ApacheServer : public node::ObjectWrap {
         public:
         static void Initialize(Handle<Object> target) {
@@ -116,4 +113,6 @@ namespace mod_node {
         node::Start(2, argv);
         return APR_SUCCESS;
     }
+
+    apr_thread_t *thread;
 }

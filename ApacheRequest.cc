@@ -1,5 +1,13 @@
+#include "ApacheRequest.h"
+
+#include <httpd.h>
+#include <http_protocol.h>
+
+using namespace v8;
 
 namespace mod_node {
+    static Persistent<FunctionTemplate> req_function_template;
+
     void ApacheRequest::Initialize(Handle<Object> target) {
         v8::Locker l;
         HandleScope scope;
@@ -41,23 +49,16 @@ namespace mod_node {
         return Undefined();
     }
 
+    ApacheRequest::ApacheRequest() {
+        r = 0;
+    }
 
-    class ApacheRequest : public node::ObjectWrap {
+    ApacheRequest::ApacheRequest(request_rec *req) {
+        r = req;
+    }
 
-        protected:
-
-
-        void write(char *str) {
-            ap_rputs(str, r);
-        }
-
-        ApacheRequest() {
-            r = 0;
-        }
-
-        ApacheRequest(request_rec *req) {
-            r = req;
-        }
-    };
+    void ApacheRequest::write(char *str) {
+        ap_rputs(str, r);
+    }
 
 };

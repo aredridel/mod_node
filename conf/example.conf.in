@@ -1,7 +1,8 @@
 LogLevel debug
 Listen 10888
-LoadModule node_module build/default/libmod_node.so
+LoadModule node_module build/default/libmod_node.%SOEXT%
 PidFile logs/httpd.pid
 SetHandler node-script
 DocumentRoot public
 NodeStartupScript runtime.js
+LockFile logs/accept_lock
