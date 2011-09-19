@@ -36,8 +36,8 @@ namespace mod_node {
 
     void ApacheProcess::Initialize(Handle<Object> target) {
         using mod_node::process;
-        HandleScope scope;
         v8::Locker l;
+        HandleScope scope;
         proc_function_template = Persistent<FunctionTemplate>::New(FunctionTemplate::New());
         proc_function_template->InstanceTemplate()->SetInternalFieldCount(2); // 1 + ungodly HACK
         proc_function_template->SetClassName(String::New("ApacheProcess"));
