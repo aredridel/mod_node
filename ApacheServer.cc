@@ -5,7 +5,7 @@ using namespace node;
 
 namespace mod_node {
     void ApacheServer::Initialize(Handle<Object> target) {
-        v8::Locker l;
+        //v8::Locker l;
         HandleScope scope;
         Local<FunctionTemplate> t = FunctionTemplate::New(New);
         // @todo Connect up the apache request to emitting a Request here

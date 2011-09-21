@@ -26,8 +26,8 @@ def configure(conf):
              msg="Checking linker accepts %s" % ldflags,
              define_name='USE_UNDEFINED_DYNAMIC')
   conf.check(header_name='httpd.h', compile_mode='cc', uselib=['HTTPD', 'APR', 'APU'], mandatory=True)
-  conf.check(lib='node')
-  conf.check(lib='v8')
+  conf.check(lib='node', uselib_store='NODE')
+  conf.check(lib='v8', uselib_store='V8')
 
 def build(bld):
   bld.new_task_gen(

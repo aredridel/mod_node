@@ -1,9 +1,6 @@
 #ifndef __ApacheServer_h__
 #define __ApacheServer_h__
 
-#include <v8.h>
-#include <node.h>
-
 #include "mod_node.h"
 
 namespace mod_node {

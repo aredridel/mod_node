@@ -1,19 +1,5 @@
-#include <httpd.h>
-#include <http_config.h>
-#include <http_protocol.h>
-#include <http_log.h>
-#include <apr_thread_proc.h>
-#include <apr_thread_mutex.h>
-#include <apr_thread_cond.h>
-#include <apr_queue.h>
+#define EV_MULTIPLICITY 0
 
-#include <mod_proxy.h>
-
-#undef EV_MULTIPLICITY
-
-#include <v8.h>
-#include <node.h>
-#include <node_object_wrap.h>
 
 #include "mod_node.h"
 #include "ApacheProcess.h"
@@ -40,14 +26,6 @@ static const command_rec node_config_cmds[] = {
     { NULL }    
 };
 
-namespace mod_node {
-    extern void Initialize(v8::Handle<v8::Object> target) {
-        ApacheProcess::Initialize(target);
-        ApacheRequest::Initialize(target);
-        ApacheServer::Initialize(target);
-    }
-}
-
 extern "C" {
     module AP_MODULE_DECLARE_DATA node_module = {
         STANDARD20_MODULE_STUFF,
@@ -67,6 +45,12 @@ static const char * node_cmd_startup_script(cmd_parms *cmd, void *dcfg, const ch
 }
 
 namespace mod_node {
+    extern void Initialize(v8::Handle<v8::Object> target) {
+        ApacheProcess::Initialize(target);
+        ApacheServer::Initialize(target);
+        ApacheRequest::Initialize(target);
+    }
+
     void *start_node(apr_thread_t *th, void* data) {
         char **argv;
         server_rec *s = (server_rec *)data;

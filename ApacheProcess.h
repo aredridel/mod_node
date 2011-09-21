@@ -1,15 +1,6 @@
 #ifndef __ApacheProcess_h__
 #define __ApacheProcess_h__
 
-#include <v8.h>
-#include <node.h>
-#include <node_object_wrap.h>
-
-#include <apr_pools.h>
-#include <apr_queue.h>
-
-#include <httpd.h>
-
 #include "mod_node.h"
 
 using namespace v8;

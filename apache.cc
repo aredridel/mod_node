@@ -1,3 +1,5 @@
+#define EV_MULTIPLICITY 0
+
 #include <node.h>
 #include <node_events.h>
 #include <httpd.h>

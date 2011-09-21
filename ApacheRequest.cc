@@ -1,15 +1,12 @@
 #include "ApacheRequest.h"
 
-#include <httpd.h>
-#include <http_protocol.h>
-
 using namespace v8;
 
 namespace mod_node {
     static Persistent<FunctionTemplate> req_function_template;
 
     void ApacheRequest::Initialize(Handle<Object> target) {
-        v8::Locker l;
+        //v8::Locker l;
         HandleScope scope;
         if(req_function_template.IsEmpty()) {
             req_function_template = Persistent<FunctionTemplate>(FunctionTemplate::New());
@@ -22,7 +19,7 @@ namespace mod_node {
     }
 
     Handle<Value> ApacheRequest::New(request_rec *r) {
-        v8::Locker l;
+        //v8::Locker l;
         HandleScope scope;
 
         Handle<Object> req = req_function_template->GetFunction()->NewInstance();
@@ -32,7 +29,7 @@ namespace mod_node {
     }
 
     Handle<Value> ApacheRequest::Write(const Arguments &args) {
-        v8::Locker l;
+        //v8::Locker l;
         ApacheRequest *req = ObjectWrap::Unwrap<ApacheRequest>(args.Holder());
 
         HandleScope scope;

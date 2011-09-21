@@ -1,4 +1,4 @@
-WAF = which waf && WAF=waf || WAF=node-waf; "$$WAF"
+WAF=node-waf
 
 all: mod_node
 
@@ -15,4 +15,4 @@ debug: mod_node conf/example.conf
 	env NODE_PATH=`pwd`/build/default/ gdb --args httpd -d `pwd` -f conf/example.conf -k start -DNO_DETACH -DFOREGROUND -DDEBUG -DONE_PROCESS
 
 conf/example.conf: conf/example.conf.in
-	cat $< | sed -e 's/%SOEXT%/dylib/' > $@
+	cat $< | sed -e 's/%SOEXT%/so/' > $@

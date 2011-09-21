@@ -1,13 +1,5 @@
 #include "ApacheProcess.h"
 
-#include <httpd.h>
-#include <http_config.h>
-#include <http_protocol.h>
-#include <http_log.h>
-
-#include <apr_thread_mutex.h>
-#include <apr_thread_cond.h>
-
 #include "ApacheRequest.h"
 
 namespace mod_node {
@@ -18,7 +10,6 @@ namespace mod_node {
     } request_ext;
 
     static Persistent<FunctionTemplate> proc_function_template;
-    static Persistent<String> emit_symbol;
     static Persistent<String> log_symbol;
     static Persistent<String> warn_symbol;
     static Persistent<String> crit_symbol;
@@ -36,12 +27,11 @@ namespace mod_node {
 
     void ApacheProcess::Initialize(Handle<Object> target) {
         using mod_node::process;
-        v8::Locker l;
+        //v8::Locker l;
         HandleScope scope;
         proc_function_template = Persistent<FunctionTemplate>::New(FunctionTemplate::New());
         proc_function_template->InstanceTemplate()->SetInternalFieldCount(2); // 1 + ungodly HACK
         proc_function_template->SetClassName(String::New("ApacheProcess"));
-        emit_symbol = NODE_PSYMBOL("emit");
         log_symbol = NODE_PSYMBOL("log");
         warn_symbol = NODE_PSYMBOL("warn");
         crit_symbol = NODE_PSYMBOL("critical");
@@ -56,7 +46,7 @@ namespace mod_node {
         ProcessFunc = Persistent<Function>::New(proc_function_template->GetFunction());
         Process = Persistent<Object>::New(ProcessFunc->NewInstance());
         ApacheProcess *p = new ApacheProcess(process, Process);
-        target->Set(String::New("Process"), ProcessFunc);
+        target->Set(String::New("ApacheProcess"), ProcessFunc);
         target->Set(String::New("process"), Process);
     }
 
@@ -84,7 +74,7 @@ namespace mod_node {
         request_ext rex;
         rex.cont_request = 0;
         int rc = OK;
-        v8::Locker l;
+        //v8::Locker l;
         HandleScope scope;
         ApacheProcess *p = ObjectWrap::Unwrap<ApacheProcess>(Process);
         assert(p);
@@ -94,9 +84,9 @@ namespace mod_node {
         apr_thread_mutex_lock(rex.mtx);
         apr_table_setn(r->notes, "mod_node", (char *)&rex);
         apr_queue_push(p->queue, &r); // @todo Errors
-        ev_async_send(EV_DEFAULT_ &(p->req_watcher));
         {
-            v8::Unlocker unlock;
+            //v8::Unlocker unlock;
+            ev_async_send(EV_DEFAULT_ &(p->req_watcher));
             while(!rex.cont_request) {
                 apr_thread_cond_wait(rex.cv, rex.mtx);
             }
@@ -109,7 +99,7 @@ namespace mod_node {
 
     void ApacheProcess::RequestCallback(EV_P_ ev_async *w, int revents) {
         // Executes in Node's thread
-        v8::Locker l;
+        //v8::Locker l;
         HandleScope scope;
         Handle<Object> proc = *static_cast<Handle<Object> *>(w->data);
         ApacheProcess *p = ObjectWrap::Unwrap<ApacheProcess>(proc);
@@ -118,12 +108,20 @@ namespace mod_node {
         Handle<Value> req = ApacheRequest::New(r);
         Local<Value> callback_v = proc->Get(onrequest_sym);
         if(!callback_v->IsFunction()) return;
+        TryCatch trycatch;
+        trycatch.SetVerbose(true);
+        trycatch.SetCaptureMessage(true);
         Local<Function>::Cast(callback_v)->Call(proc, 1, &req);
+        if(trycatch.HasCaught()) {
+            v8::String::Utf8Value str(trycatch.Message()->Get());
+            ap_log_perror(APLOG_MARK, APLOG_ERR, APR_SUCCESS, p->process->pool, "%s", *str);
+        }
+
     };
 
     Handle<Value> ApacheProcess::Write(const Arguments& args) {
         if (args.Length() < 1) return Undefined();
-        v8::Locker l;
+        //v8::Locker l;
         HandleScope scope;
         Handle<Value> arg = args[0];
         String::Utf8Value value(arg);
@@ -157,7 +155,7 @@ namespace mod_node {
     }
 
     Handle<Value> ApacheProcess::DoLog(int level, const Arguments &args) {
-        v8::Locker l;
+        //v8::Locker l;
         ApacheProcess *p = ObjectWrap::Unwrap<ApacheProcess>(args.Holder());
         assert(p);
         if (args.Length() < 1 || !args[0]->IsString()) {
