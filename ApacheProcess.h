@@ -15,7 +15,7 @@ namespace mod_node {
         static void register_hooks(apr_pool_t *p);
 
         protected:
-        ApacheProcess(process_rec *p, Handle<Object> Process);
+        ApacheProcess(process_rec*, Handle<Object>);
         ~ApacheProcess();
         static int handler(request_rec *r);
         static void RequestCallback(EV_P_ ev_async *w, int revents);

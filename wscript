@@ -31,8 +31,8 @@ def configure(conf):
 
 def build(bld):
   bld.new_task_gen(
-    source = 'apache.cc',
-    target = 'apache',
+    source = 'apache_binding.cc',
+    target = 'apache_binding',
     features = 'cshlib cxx node_addon',
     uselib = ['HTTPD', 'APU', 'APR'], 
     linkflags = ['-Wl,-undefined', '-Wl,dynamic_lookup'] if bld.env.USE_UNDEFINED_DYNAMIC else [])

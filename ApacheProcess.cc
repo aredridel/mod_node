@@ -30,7 +30,7 @@ namespace mod_node {
         //v8::Locker l;
         HandleScope scope;
         proc_function_template = Persistent<FunctionTemplate>::New(FunctionTemplate::New());
-        proc_function_template->InstanceTemplate()->SetInternalFieldCount(2); // 1 + ungodly HACK
+        proc_function_template->InstanceTemplate()->SetInternalFieldCount(1);
         proc_function_template->SetClassName(String::New("ApacheProcess"));
         log_symbol = NODE_PSYMBOL("log");
         warn_symbol = NODE_PSYMBOL("warn");
@@ -55,7 +55,7 @@ namespace mod_node {
         ap_hook_handler(ApacheProcess::handler, NULL, NULL, APR_HOOK_MIDDLE);
     };
 
-    ApacheProcess::ApacheProcess(process_rec *p, Handle<Object> Process) : ObjectWrap() {
+    ApacheProcess::ApacheProcess(process_rec *p, Handle<Object> Process) : process(p) {
         this->Wrap(Process);
         apr_queue_create(&queue, 100, p->pool); // @todo handle error
         ev_async_init(EV_DEFAULT_ &req_watcher, ApacheProcess::RequestCallback);

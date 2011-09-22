@@ -59,7 +59,7 @@ namespace mod_node {
             argv[0] = (char *)malloc(32);
         strcpy(argv[0], "node");
         argv[1] = strdup(conf->startup_script);
-        ap_log_error(APLOG_MARK, APLOG_ERR, 0, s, "mod_node::startup script: %s", argv[1]);
+        ap_log_error(APLOG_MARK, APLOG_INFO, 0, s, "mod_node::startup script: %s", argv[1]);
         // @todo error handling if the runtime script throws an exception
         // Probably atexit(3) and log an error and clean up, return a 500 error.
         node::Start(2, argv);
