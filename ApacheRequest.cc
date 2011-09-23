@@ -4,32 +4,31 @@ using namespace v8;
 
 namespace mod_node {
     static Persistent<FunctionTemplate> req_function_template;
+    static Persistent<Function> req_function;
 
     void ApacheRequest::Initialize(Handle<Object> target) {
-        //v8::Locker l;
         HandleScope scope;
         if(req_function_template.IsEmpty()) {
             req_function_template = Persistent<FunctionTemplate>(FunctionTemplate::New());
-            req_function_template->SetClassName(String::NewSymbol("Request"));
+            req_function_template->SetClassName(String::NewSymbol("ApacheRequest"));
             req_function_template->InstanceTemplate()->SetInternalFieldCount(1);
             NODE_SET_PROTOTYPE_METHOD(req_function_template, "write", Write);
         }
 
-        target->Set(String::New("Request"), req_function_template->GetFunction());
+        req_function = Persistent<Function>::New(req_function_template->GetFunction());
+        target->Set(String::New("Request"), req_function);
     }
 
     Handle<Value> ApacheRequest::New(request_rec *r) {
-        //v8::Locker l;
         HandleScope scope;
 
-        Handle<Object> req = req_function_template->GetFunction()->NewInstance();
+        Handle<Object> req = req_function->NewInstance();
         ApacheRequest *s = new ApacheRequest(r);
         s->Wrap(req);
         return req;
     }
 
     Handle<Value> ApacheRequest::Write(const Arguments &args) {
-        //v8::Locker l;
         ApacheRequest *req = ObjectWrap::Unwrap<ApacheRequest>(args.Holder());
 
         HandleScope scope;
