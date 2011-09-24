@@ -3,11 +3,6 @@
 #include "ApacheRequest.h"
 
 namespace mod_node {
-    typedef struct {
-        int cont_request;
-        apr_thread_cond_t *cv;
-        apr_thread_mutex_t *mtx;
-    } request_ext;
 
     static apr_queue_t *queue;
     static ev_async req_watcher;
@@ -44,9 +39,6 @@ namespace mod_node {
         crit_symbol = NODE_PSYMBOL("critical");
         NODE_SET_PROTOTYPE_METHOD(proc_function_template, "critical", Crit);
 
-        write_symbol = NODE_PSYMBOL("write");
-        NODE_SET_PROTOTYPE_METHOD(proc_function_template, "write", Write); // HACK!
-
         onrequest_sym = NODE_PSYMBOL("onrequest");
 
         ProcessFunc = Persistent<Function>::New(proc_function_template->GetFunction());
@@ -73,6 +65,7 @@ namespace mod_node {
 
         apr_status_t rv;
         request_ext rex;
+        rex.req = r;
         rex.cont_request = 0;
         int rc = OK;
         apr_thread_cond_create(&rex.cv, process->pool);
@@ -80,7 +73,7 @@ namespace mod_node {
 
         apr_thread_mutex_lock(rex.mtx);
         apr_table_setn(r->notes, "mod_node", (char *)&rex);
-        apr_queue_push(queue, r); // @todo Errors
+        apr_queue_push(queue, &rex); // @todo Errors
         {
             ev_async_send(EV_DEFAULT_ &req_watcher);
             while(!rex.cont_request) {
@@ -99,9 +92,9 @@ namespace mod_node {
         using mod_node::req_watcher;
 
         HandleScope scope;
-        request_rec *r;
-        apr_queue_pop(queue, (void **)&r); // @todo Errors
-        Handle<Value> req = ApacheRequest::New(r);
+        request_ext *rex;
+        apr_queue_pop(queue, (void **)&rex); // @todo Errors
+        Handle<Value> req = ApacheRequest::New(rex);
         Local<Value> callback_v = Process->Get(onrequest_sym);
         if(!callback_v->IsFunction()) return;
         TryCatch trycatch;
@@ -116,28 +109,6 @@ namespace mod_node {
         }
 
     };
-
-    Handle<Value> ApacheProcess::Write(const Arguments& args) {
-        if (args.Length() < 1) return Undefined();
-        HandleScope scope;
-        Handle<Value> arg = args[0];
-        String::Utf8Value value(arg);
-        Local<Object> self = args.Holder();
-        Local<External> wrap = Local<External>::Cast(self->GetInternalField(1));
-
-        request_rec *r = static_cast<request_rec*>(wrap->Value());
-        request_ext *rex;
-        apr_table_get(r->notes, "mod_node"); // @todo Errors
-
-        ap_rputs(*value, r);
-
-        rex->cont_request = 1;
-        apr_thread_mutex_lock(rex->mtx);
-        apr_thread_cond_signal(rex->cv);
-        apr_thread_mutex_unlock(rex->mtx);
-
-        return Undefined();
-    }
 
     Handle<Value> ApacheProcess::Crit(const Arguments &args) {
         return DoLog(APLOG_CRIT, args);
