@@ -8,11 +8,11 @@ namespace mod_node {
     public:
         request_rec *r;
         static void Initialize(v8::Handle<v8::Object> target);
-        static v8::Handle<v8::Value> New(request_rec *r);
+        static v8::Handle<v8::Object> New(request_rec *r);
 
     protected:
         static v8::Handle<v8::Value> Write(const v8::Arguments &args);
-        ApacheRequest();
+        static v8::Handle<v8::Value> End(const v8::Arguments &args);
         ApacheRequest(request_rec *req);
         void write(char *str);
 

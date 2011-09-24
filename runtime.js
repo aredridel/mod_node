@@ -21,5 +21,9 @@ process.on('exit', function() {
 */
 
 apache.process.onrequest = function(req) {
-    console.log(req)
+    console.log("req", req)
+    console.log("this", this)
+    console.log("args", arguments)
+    req.write('Boo')
+    req.end()
 }

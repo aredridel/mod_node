@@ -16,12 +16,10 @@ namespace mod_node {
         }
 
         req_function = Persistent<Function>::New(req_function_template->GetFunction());
-        target->Set(String::New("Request"), req_function);
+        target->Set(String::New("ApacheRequest"), req_function);
     }
 
-    Handle<Value> ApacheRequest::New(request_rec *r) {
-        HandleScope scope;
-
+    Handle<Object> ApacheRequest::New(request_rec *r) {
         Handle<Object> req = req_function->NewInstance();
         ApacheRequest *s = new ApacheRequest(r);
         s->Wrap(req);
@@ -31,22 +29,23 @@ namespace mod_node {
     Handle<Value> ApacheRequest::Write(const Arguments &args) {
         ApacheRequest *req = ObjectWrap::Unwrap<ApacheRequest>(args.Holder());
 
-        HandleScope scope;
         if (args.Length() == 0 || !args[0]->IsString()) {
             return ThrowException(Exception::TypeError(
-                String::New("First argument must be a string"))
-            );
+                String::New("First argument must be a string")));
         }
 
         String::Utf8Value str(args[0]->ToString());
         req->write(*str);
 
-
         return Undefined();
     }
 
-    ApacheRequest::ApacheRequest() {
-        r = 0;
+    Handle<Value> ApacheRequest::End(const Arguments &args) {
+        if(args.Length() > 0) Write(args);
+
+        // Signal condition variable
+
+        return Undefined();
     }
 
     ApacheRequest::ApacheRequest(request_rec *req) {

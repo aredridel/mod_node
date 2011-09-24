@@ -80,7 +80,7 @@ namespace mod_node {
 
         apr_thread_mutex_lock(rex.mtx);
         apr_table_setn(r->notes, "mod_node", (char *)&rex);
-        apr_queue_push(queue, &r); // @todo Errors
+        apr_queue_push(queue, r); // @todo Errors
         {
             ev_async_send(EV_DEFAULT_ &req_watcher);
             while(!rex.cont_request) {
@@ -107,7 +107,9 @@ namespace mod_node {
         TryCatch trycatch;
         trycatch.SetVerbose(true);
         trycatch.SetCaptureMessage(true);
-        Local<Function>::Cast(callback_v)->Call(Process, 1, &req);
+        const int argc = 1;
+        Handle<Value> args[argc] = { req };
+        Local<Function>::Cast(callback_v)->Call(Process, 1, args);
         if(trycatch.HasCaught()) {
             v8::String::Utf8Value str(trycatch.Message()->Get());
             ap_log_perror(APLOG_MARK, APLOG_ERR, APR_SUCCESS, process->pool, "%s", *str);
