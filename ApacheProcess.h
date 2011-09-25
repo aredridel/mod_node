@@ -14,11 +14,8 @@ namespace mod_node {
         protected:
         static int handler(request_rec *r);
         static void RequestCallback(EV_P_ ev_async *w, int revents);
-        static Handle<Value> Crit(const Arguments &args);
-        static Handle<Value> Warn(const Arguments &args);
         static Handle<Value> Log(const Arguments &args);
         static Handle<Value> Write(const Arguments& args);
-        static Handle<Value> DoLog(int level, const Arguments &args);
     };
 };
 

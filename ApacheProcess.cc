@@ -7,14 +7,10 @@ namespace mod_node {
     static apr_queue_t *queue;
     static ev_async req_watcher;
 
-    static Persistent<String> log_symbol;
-    static Persistent<String> warn_symbol;
-    static Persistent<String> crit_symbol;
-    static Persistent<String> write_symbol;
-    static Persistent<String> onrequest_sym;
-
     static Persistent<Object> Process;
     static Persistent<Function> ProcessFunc;
+
+    static Persistent<String> onrequest_sym;
 
     static process_rec *process;
 
@@ -30,14 +26,16 @@ namespace mod_node {
         proc_function_template->InstanceTemplate()->SetInternalFieldCount(1);
         proc_function_template->SetClassName(String::New("ApacheProcess"));
 
-        log_symbol = NODE_PSYMBOL("log");
         NODE_SET_PROTOTYPE_METHOD(proc_function_template, "log", Log);
 
-        warn_symbol = NODE_PSYMBOL("warn");
-        NODE_SET_PROTOTYPE_METHOD(proc_function_template, "warn", Warn);
-
-        crit_symbol = NODE_PSYMBOL("critical");
-        NODE_SET_PROTOTYPE_METHOD(proc_function_template, "critical", Crit);
+        target->Set(String::New("APLOG_EMERG"), v8::Integer::NewFromUnsigned(APLOG_EMERG));
+        target->Set(String::New("APLOG_ALERT"), v8::Integer::NewFromUnsigned(APLOG_ALERT));
+        target->Set(String::New("APLOG_CRIT"), v8::Integer::NewFromUnsigned(APLOG_CRIT));
+        target->Set(String::New("APLOG_ERR"), v8::Integer::NewFromUnsigned(APLOG_ERR));
+        target->Set(String::New("APLOG_WARNING"), v8::Integer::NewFromUnsigned(APLOG_WARNING));
+        target->Set(String::New("APLOG_INFO"), v8::Integer::NewFromUnsigned(APLOG_INFO));
+        target->Set(String::New("APLOG_NOTICE"), v8::Integer::NewFromUnsigned(APLOG_NOTICE));
+        target->Set(String::New("APLOG_DEBUG"), v8::Integer::NewFromUnsigned(APLOG_DEBUG));
 
         onrequest_sym = NODE_PSYMBOL("onrequest");
 
@@ -110,24 +108,12 @@ namespace mod_node {
 
     };
 
-    Handle<Value> ApacheProcess::Crit(const Arguments &args) {
-        return DoLog(APLOG_CRIT, args);
-    }
-
-    Handle<Value> ApacheProcess::Warn(const Arguments &args) {
-        return DoLog(APLOG_WARNING, args);
-    }
-
     Handle<Value> ApacheProcess::Log(const Arguments &args) {
-        return DoLog(APLOG_INFO, args);
-    }
-
-    Handle<Value> ApacheProcess::DoLog(int level, const Arguments &args) {
-        if (args.Length() < 1 || !args[0]->IsString()) {
+        if (args.Length() < 2 || !args[1]->IsString() || !args[0]->IsInt32()) {
             return THROW_BAD_ARGS;
         }
-        String::Utf8Value val(args[0]->ToString());
-        ap_log_perror(APLOG_MARK, level, APR_SUCCESS, process->pool, "%s", *val);
+        String::Utf8Value val(args[1]->ToString());
+        ap_log_perror(APLOG_MARK, args[0]->ToInt32()->Value(), APR_SUCCESS, process->pool, "%s", *val);
         return Undefined();
     };
 

@@ -2,11 +2,14 @@ var apache = require('apache');
 var fs = require('fs');
 var util = require('util');
 
-console.log(apache.process);
-
-apache.process.critical("critical");
-apache.process.warn("warn");
-apache.process.log("info");
+apache.process.log(apache.APLOG_EMERG, "APLOG_EMERG");
+apache.process.log(apache.APLOG_ALERT, "APLOG_ALERT");
+apache.process.log(apache.APLOG_CRIT, "APLOG_CRIT");
+apache.process.log(apache.APLOG_ERR, "APLOG_ERR");
+apache.process.log(apache.APLOG_WARNING, "APLOG_WARNING");
+apache.process.log(apache.APLOG_INFO, "APLOG_INFO");
+apache.process.log(apache.APLOG_NOTICE, "APLOG_NOTICE");
+apache.process.log(apache.APLOG_DEBUG, "APLOG_DEBUG");
 
 /*
 apache.process.on("connection", function(req) {
