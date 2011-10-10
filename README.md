@@ -14,3 +14,6 @@ Are you still reading this? Oh no!
 -------
 
 This is preview code only. Expect it to only barely work. Maybe.
+
+You'll need a node shared library: make sharedlib in the node source tree to
+get one.
