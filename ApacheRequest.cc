@@ -12,7 +12,7 @@ namespace mod_node {
             req_function_template = Persistent<FunctionTemplate>(FunctionTemplate::New());
             req_function_template->SetClassName(String::NewSymbol("ApacheRequest"));
             req_function_template->InstanceTemplate()->SetInternalFieldCount(1);
-            NODE_SET_PROTOTYPE_METHOD(req_function_template, "write", Write);
+            NODE_SET_PROTOTYPE_METHOD(req_function_template, "rputs", do_rputs);
             NODE_SET_PROTOTYPE_METHOD(req_function_template, "end", End);
         }
 
@@ -27,7 +27,7 @@ namespace mod_node {
         return req;
     }
 
-    Handle<Value> ApacheRequest::Write(const Arguments &args) {
+    Handle<Value> ApacheRequest::do_rputs(const Arguments &args) {
         ApacheRequest *req = ObjectWrap::Unwrap<ApacheRequest>(args.Holder());
 
         if (args.Length() == 0 || !args[0]->IsString()) {
@@ -37,13 +37,13 @@ namespace mod_node {
 
         String::Utf8Value str(args[0]->ToString());
 
-        req->write(*str);
+        req->rputs(*str);
 
         return Undefined();
     }
 
     Handle<Value> ApacheRequest::End(const Arguments &args) {
-        if(args.Length() > 0) Write(args);
+        if(args.Length() > 0) do_rputs(args);
 
         ApacheRequest *req = ObjectWrap::Unwrap<ApacheRequest>(args.Holder());
         req->end();
@@ -57,7 +57,7 @@ namespace mod_node {
     {
     }
 
-    void ApacheRequest::write(char *str) {
+    void ApacheRequest::rputs(char *str) {
         ap_rputs(str, rex->req);
     }
 

@@ -18,10 +18,10 @@ namespace mod_node {
         static v8::Handle<v8::Object> New(request_ext *rex);
 
     protected:
-        static v8::Handle<v8::Value> Write(const v8::Arguments &args);
+        static v8::Handle<v8::Value> do_rputs(const v8::Arguments &args);
         static v8::Handle<v8::Value> End(const v8::Arguments &args);
         ApacheRequest(request_ext *rex);
-        void write(char *str);
+        void rputs(char *str);
         void end();
 
 

@@ -27,6 +27,6 @@ apache.process.onrequest = function(req) {
     console.log("req", req)
     console.log("this", this)
     console.log("args", arguments)
-    req.write('Boo')
+    req.rputs('Boo')
     req.end()
 }
