@@ -42,7 +42,7 @@ namespace mod_node {
         ProcessFunc = Persistent<Function>::New(proc_function_template->GetFunction());
         Process = Persistent<Object>::New(ProcessFunc->NewInstance());
 
-        apr_queue_create(&queue, 100, process->pool); // @todo handle error
+        apr_queue_create(&queue, 1000, process->pool); // @todo handle error; @todo dynamically size queue (based on maxrequests?)
         ev_async_init(EV_DEFAULT_UC_ &req_watcher, ApacheProcess::RequestCallback);
         ev_async_start(EV_DEFAULT_UC_ &req_watcher);
         ev_ref(EV_DEFAULT_UC);
@@ -71,7 +71,7 @@ namespace mod_node {
 
         apr_thread_mutex_lock(rex.mtx);
         apr_table_setn(r->notes, "mod_node", (char *)&rex);
-        apr_queue_push(queue, &rex); // @todo Errors
+        while (apr_queue_push(queue, &rex) == APR_EAGAIN); // @todo Errors
         {
             ev_async_send(EV_DEFAULT_ &req_watcher);
             while(!rex.cont_request) {
