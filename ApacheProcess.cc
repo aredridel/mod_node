@@ -91,19 +91,21 @@ namespace mod_node {
 
         HandleScope scope;
         request_ext *rex;
-        apr_queue_pop(queue, (void **)&rex); // @todo Errors
-        Handle<Value> req = ApacheRequest::New(rex);
-        Local<Value> callback_v = Process->Get(onrequest_sym);
-        if(!callback_v->IsFunction()) return;
-        TryCatch trycatch;
-        trycatch.SetVerbose(true);
-        trycatch.SetCaptureMessage(true);
-        const int argc = 1;
-        Handle<Value> args[argc] = { req };
-        Local<Function>::Cast(callback_v)->Call(Process, 1, args);
-        if(trycatch.HasCaught()) {
-            v8::String::Utf8Value str(trycatch.Message()->Get());
-            ap_log_perror(APLOG_MARK, APLOG_ERR, APR_SUCCESS, process->pool, "%s", *str);
+        while (apr_queue_trypop(queue, (void **)&rex) == APR_SUCCESS) {
+            // @todo Errors
+            Handle<Value> req = ApacheRequest::New(rex);
+            Local<Value> callback_v = Process->Get(onrequest_sym);
+            if(!callback_v->IsFunction()) return;
+            TryCatch trycatch;
+            trycatch.SetVerbose(true);
+            trycatch.SetCaptureMessage(true);
+            const int argc = 1;
+            Handle<Value> args[argc] = { req };
+            Local<Function>::Cast(callback_v)->Call(Process, 1, args);
+            if(trycatch.HasCaught()) {
+                v8::String::Utf8Value str(trycatch.Message()->Get());
+                ap_log_perror(APLOG_MARK, APLOG_ERR, APR_SUCCESS, process->pool, "%s", *str);
+            }
         }
 
     };
