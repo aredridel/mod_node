@@ -5,7 +5,7 @@
 namespace mod_node {
 
     static apr_queue_t *queue;
-    static ev_async req_watcher;
+    static uv_async_t req_watcher;
 
     static Persistent<Object> Process;
     static Persistent<Function> ProcessFunc;
@@ -43,9 +43,10 @@ namespace mod_node {
         Process = Persistent<Object>::New(ProcessFunc->NewInstance());
 
         apr_queue_create(&queue, 1000, process->pool); // @todo handle error; @todo dynamically size queue (based on maxrequests?)
-        ev_async_init(EV_DEFAULT_UC_ &req_watcher, ApacheProcess::RequestCallback);
-        ev_async_start(EV_DEFAULT_UC_ &req_watcher);
-        ev_ref(EV_DEFAULT_UC);
+        
+        /* This will leave the event loop with one reference, which we 
+           want since we want to last as long as Apache */
+        uv_async_init(uv_default_loop(), &req_watcher, ApacheProcess::RequestCallback);
 
         target->Set(String::New("ApacheProcess"), ProcessFunc);
         target->Set(String::New("process"), Process);
@@ -61,7 +62,6 @@ namespace mod_node {
         using mod_node::queue;
         using mod_node::req_watcher;
 
-        apr_status_t rv;
         request_ext rex;
         rex.req = r;
         rex.cont_request = 0;
@@ -73,7 +73,7 @@ namespace mod_node {
         apr_table_setn(r->notes, "mod_node", (char *)&rex);
         while (apr_queue_push(queue, &rex) == APR_EAGAIN); // @todo Errors
         {
-            ev_async_send(EV_DEFAULT_ &req_watcher);
+            uv_async_send(&req_watcher);
             while(!rex.cont_request) {
                 apr_thread_cond_wait(rex.cv, rex.mtx);
             }
@@ -84,7 +84,7 @@ namespace mod_node {
     }
 
 
-    void ApacheProcess::RequestCallback(EV_P_ ev_async *w, int revents) {
+    void ApacheProcess::RequestCallback(uv_async_t* handle, int status) {
         // Executes in Node's thread
         using mod_node::queue;
         using mod_node::req_watcher;

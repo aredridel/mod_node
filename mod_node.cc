@@ -1,6 +1,3 @@
-#define EV_MULTIPLICITY 0
-
-
 #include "mod_node.h"
 #include "ApacheProcess.h"
 #include "ApacheRequest.h"

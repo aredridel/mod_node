@@ -9,13 +9,13 @@ build/c4che/build.config.py:
 	${WAF} configure
 
 start: mod_node conf/example.conf
-	env NODE_PATH=`pwd`:`pwd`/build/default/ httpd -d `pwd` -f conf/example.conf -k start ${OPTS}
+	env NODE_PATH=`pwd`:`pwd`/build/Release/ httpd -d `pwd` -f conf/example.conf -k start ${OPTS}
 
 stop:
-	env NODE_PATH=`pwd`:`pwd`/build/default/ httpd -d `pwd` -f conf/example.conf -k stop
+	env NODE_PATH=`pwd`:`pwd`/build/Release/ httpd -d `pwd` -f conf/example.conf -k stop
 
 debug: mod_node conf/example.conf
-	env NODE_PATH=`pwd`:`pwd`/build/default/ gdb --args httpd -d `pwd` -f conf/example.conf -k start -DNO_DETACH -DFOREGROUND -DDEBUG -DONE_PROCESS
+	env NODE_PATH=`pwd`:`pwd`/build/Release/ gdb --args httpd -d `pwd` -f conf/example.conf -k start -DNO_DETACH -DFOREGROUND -DDEBUG -DONE_PROCESS
 
 conf/example.conf: conf/example.conf.in
 	cat $< | sed -e 's/%SOEXT%/so/' > $@

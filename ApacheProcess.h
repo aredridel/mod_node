@@ -13,7 +13,7 @@ namespace mod_node {
 
         protected:
         static int handler(request_rec *r);
-        static void RequestCallback(EV_P_ ev_async *w, int revents);
+        static void RequestCallback(uv_async_t *handle, int status);
         static Handle<Value> Log(const Arguments &args);
         static Handle<Value> Write(const Arguments& args);
     };

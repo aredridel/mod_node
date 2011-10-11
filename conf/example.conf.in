@@ -1,6 +1,6 @@
 LogLevel debug
 Listen 10888
-LoadModule node_module build/default/libmod_node.%SOEXT%
+LoadModule node_module build/Release/libmod_node.%SOEXT%
 PidFile logs/httpd.pid
 SetHandler node-script
 DocumentRoot public

@@ -1,8 +1,6 @@
 #ifndef __mod_node_h__
 #define __mod_node_h__
 
-#define xEV_MULTIPLICITY 1
-
 #include <httpd.h>
 #include <http_config.h>
 #include <http_protocol.h>
