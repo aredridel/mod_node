@@ -2,6 +2,7 @@
 #include "ApacheProcess.h"
 #include "ApacheRequest.h"
 #include "ApacheServer.h"
+#include "ApacheTable.h"
 
 using namespace v8;
 
@@ -46,6 +47,7 @@ namespace mod_node {
         ApacheProcess::Initialize(target);
         ApacheServer::Initialize(target);
         ApacheRequest::Initialize(target);
+        ApacheTable::Initialize(target);
     }
 
     void *start_node(apr_thread_t *th, void* data) {
