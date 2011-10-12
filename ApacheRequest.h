@@ -30,10 +30,27 @@ namespace mod_node {
          */
         static v8::Handle<v8::Value> End(const v8::Arguments &args);
 
+        /** Get the headers table object for this request
+         *
+         * @returns the headers table object
+         */
+        static v8::Handle<v8::Value> GetHeadersOut(v8::Local<v8::String> property, const v8::AccessorInfo& info);
+        static v8::Handle<v8::Value> GetHeadersIn(v8::Local<v8::String> property, const v8::AccessorInfo& info);
+
         ApacheRequest(request_ext *rex);
+        ~ApacheRequest();
+
         void rputs(char *str);
         void end();
 
+        v8::Persistent<v8::Value> HeadersIn;
+        v8::Persistent<v8::Value> HeadersOut;
+
+        /** Copy constructor is not supported */
+        ApacheRequest(const ApacheRequest&);
+
+        /** assignment operator is not supported */
+        ApacheRequest& operator=(const ApacheRequest&);
 
     };
 };

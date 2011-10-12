@@ -1,4 +1,5 @@
 #include "ApacheRequest.h"
+#include "ApacheTable.h"
 
 using namespace v8;
 
@@ -11,13 +12,26 @@ namespace mod_node {
         if(req_function_template.IsEmpty()) {
             req_function_template = Persistent<FunctionTemplate>(FunctionTemplate::New());
             req_function_template->SetClassName(String::NewSymbol("ApacheRequest"));
-            req_function_template->InstanceTemplate()->SetInternalFieldCount(1);
+            Handle <ObjectTemplate> itemplate = req_function_template->InstanceTemplate();
+            itemplate->SetInternalFieldCount(1);
+            itemplate->SetAccessor(String::New("headers_in"), GetHeadersIn);
+            itemplate->SetAccessor(String::New("headers_out"), GetHeadersOut);
             NODE_SET_PROTOTYPE_METHOD(req_function_template, "write", Write);
             NODE_SET_PROTOTYPE_METHOD(req_function_template, "end", End);
         }
 
         req_function = Persistent<Function>::New(req_function_template->GetFunction());
         target->Set(String::New("ApacheRequest"), req_function);
+    }
+
+    Handle<Value> ApacheRequest::GetHeadersIn(Local<String> property, const AccessorInfo& info) {
+        ApacheRequest *req = ObjectWrap::Unwrap<ApacheRequest>(info.Holder());
+        return req->HeadersIn;
+    }
+
+    Handle<Value> ApacheRequest::GetHeadersOut(Local<String> property, const AccessorInfo& info) {
+        ApacheRequest *req = ObjectWrap::Unwrap<ApacheRequest>(info.Holder());
+        return req->HeadersOut;
     }
 
     Handle<Object> ApacheRequest::New(request_ext *rex) {
@@ -54,8 +68,14 @@ namespace mod_node {
         return Undefined();
     }
 
-    ApacheRequest::ApacheRequest(request_ext *rex): rex(rex)
-    {
+    ApacheRequest::ApacheRequest(request_ext *rex): rex(rex) {
+        HeadersIn = Persistent<Value>::New(ApacheTable::New(rex->req->headers_in));
+        HeadersOut = Persistent<Value>::New(ApacheTable::New(rex->req->headers_out));
+    }
+
+    ApacheRequest::~ApacheRequest() {
+        HeadersIn.Dispose();
+        HeadersOut.Dispose();
     }
 
     void ApacheRequest::rputs(char *str) {

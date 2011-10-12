@@ -2,7 +2,7 @@ WAF=node-waf
 
 all: mod_node
 
-mod_node: mod_node.cc mod_node.h ApacheProcess.cc ApacheProcess.h ApacheRequest.cc ApacheRequest.h ApacheServer.cc ApacheServer.h build/c4che/build.config.py
+mod_node: mod_node.cc mod_node.h ApacheProcess.cc ApacheProcess.h ApacheRequest.cc ApacheRequest.h ApacheServer.cc ApacheServer.h ApacheTable.cc ApacheTable.h build/c4che/build.config.py
 	${WAF} build
 
 build/c4che/build.config.py:

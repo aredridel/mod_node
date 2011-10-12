@@ -38,7 +38,7 @@ def build(bld):
     linkflags = ['-Wl,-undefined', '-Wl,dynamic_lookup'] if bld.env.USE_UNDEFINED_DYNAMIC else [],
     cxxflags = ['-Wall'])
   bld.new_task_gen(
-    source = 'mod_node.cc ApacheProcess.cc ApacheRequest.cc ApacheServer.cc',
+    source = 'mod_node.cc ApacheProcess.cc ApacheRequest.cc ApacheServer.cc ApacheTable.cc',
     target = 'mod_node',
     features = ['cxx', 'cshlib'],
     uselib = ['HTTPD', 'APU', 'APR', 'NODE'],
