@@ -14,6 +14,8 @@ start: mod_node conf/example.conf
 stop:
 	env NODE_PATH=`pwd`:`pwd`/build/Release/ httpd -d `pwd` -f conf/example.conf -k stop
 
+restart: stop start
+
 debug: mod_node conf/example.conf
 	env NODE_PATH=`pwd`:`pwd`/build/Release/ gdb --args httpd -d `pwd` -f conf/example.conf -k start -DNO_DETACH -DFOREGROUND -DDEBUG -DONE_PROCESS
 
