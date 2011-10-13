@@ -23,7 +23,7 @@ process.on('exit', function() {
 
 */
 
-apache.process.onrequest = function(req) {
+apache.createServer(function(req) {
     apache.process.log(apache.APLOG_NOTICE, process.version)
     req.write('Boo')
     req.end()
@@ -31,4 +31,4 @@ apache.process.onrequest = function(req) {
     console.log("req", req)
     console.log("this", this)
     console.log("args", arguments)
-}
+})
