@@ -25,9 +25,10 @@ process.on('exit', function() {
 
 apache.process.onrequest = function(req) {
     apache.process.log(apache.APLOG_NOTICE, process.version)
+    req.write('Boo')
+    req.end()
+    apache.process.log(apache.APLOG_NOTICE, req.headers_in.Host)
     console.log("req", req)
     console.log("this", this)
     console.log("args", arguments)
-    req.write('Boo')
-    req.end()
 }

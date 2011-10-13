@@ -14,14 +14,14 @@ namespace mod_node {
             table_function_template->SetClassName(String::NewSymbol("ApacheTable"));
             Handle <ObjectTemplate> itemplate = table_function_template->InstanceTemplate();
             itemplate->SetInternalFieldCount(1);
-            itemplate->SetAccessor(String::New("headers_in"), ApacheTable::Get, ApacheTable::Set);
+            itemplate->SetNamedPropertyHandler(ApacheTable::MapGet, ApacheTable::MapSet);
             table_function = Persistent<Function>::New(table_function_template->GetFunction());
         }
 
         target->Set(String::New("ApacheTable"), table_function);
     };
 
-    Handle<Value> ApacheTable::Get(Local<String> property, const AccessorInfo& info) {
+    Handle<Value> ApacheTable::MapGet(Local<String> property, const AccessorInfo& info) {
         ApacheTable *table = ObjectWrap::Unwrap<ApacheTable>(info.Holder());
         const char *ret = apr_table_get(table->table, *String::Utf8Value(property));
         if(ret) {
@@ -31,11 +31,12 @@ namespace mod_node {
         }
     }
 
-    void ApacheTable::Set(Local<String> property, Local<Value> Value, const AccessorInfo& info) {
+    Handle<Value> ApacheTable::MapSet(Local<String> property, Local<Value> Value, const AccessorInfo& info) {
         ApacheTable *table = ObjectWrap::Unwrap<ApacheTable>(info.Holder());
         String::Utf8Value prop(property);
         String::Utf8Value val(Value);
         apr_table_set(table->table, *prop, *val);
+        return Value;
     }
 
     Handle<Object> ApacheTable::New(apr_table_t *tab) {

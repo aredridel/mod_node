@@ -11,8 +11,8 @@ namespace mod_node {
 
         static void Initialize(v8::Handle<v8::Object> target);
         static v8::Handle<v8::Object> New(apr_table_t *tab);
-        static v8::Handle<v8::Value> Get(v8::Local<v8::String> property, const v8::AccessorInfo& info);
-        static void Set(v8::Local<v8::String> property, v8::Local<v8::Value> Value, const v8::AccessorInfo& info);
+        static v8::Handle<v8::Value> MapGet(v8::Local<v8::String> property, const v8::AccessorInfo& info);
+        static v8::Handle<v8::Value> MapSet(v8::Local<v8::String> property, v8::Local<v8::Value> Value, const v8::AccessorInfo& info);
 
         ApacheTable(apr_table_t *table);
     };
