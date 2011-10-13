@@ -17,7 +17,19 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		59C167C8132893D70089F4CE /* apache.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = apache.cc; sourceTree = "<group>"; };
+		5976E9D5144664C300919346 /* apache_binding.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = apache_binding.cc; sourceTree = "<group>"; };
+		5976E9D6144664C300919346 /* apache.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = apache.js; sourceTree = "<group>"; };
+		5976E9D7144664C300919346 /* ApacheProcess.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ApacheProcess.cc; sourceTree = "<group>"; };
+		5976E9D8144664C300919346 /* ApacheProcess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApacheProcess.h; sourceTree = "<group>"; };
+		5976E9D9144664C300919346 /* ApacheRequest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ApacheRequest.cc; sourceTree = "<group>"; };
+		5976E9DA144664C300919346 /* ApacheRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApacheRequest.h; sourceTree = "<group>"; };
+		5976E9DB144664C300919346 /* ApacheServer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ApacheServer.cc; sourceTree = "<group>"; };
+		5976E9DC144664C300919346 /* ApacheServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApacheServer.h; sourceTree = "<group>"; };
+		5976E9DD144664C300919346 /* ApacheTable.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ApacheTable.cc; sourceTree = "<group>"; };
+		5976E9DE144664C300919346 /* ApacheTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApacheTable.h; sourceTree = "<group>"; };
+		5976E9DF144664C300919346 /* INSTALL.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = INSTALL.md; sourceTree = "<group>"; };
+		5976E9E0144664C300919346 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		5976E9E1144664C300919346 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		59C167CA132893D70089F4CE /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		59C167CC132893D70089F4CE /* mod_node.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mod_node.cc; sourceTree = "<group>"; };
 		59C167CD132893D70089F4CE /* mod_node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mod_node.h; sourceTree = "<group>"; };
@@ -31,6 +43,19 @@
 		597563B4132892CC007619C1 = {
 			isa = PBXGroup;
 			children = (
+				5976E9D5144664C300919346 /* apache_binding.cc */,
+				5976E9D6144664C300919346 /* apache.js */,
+				5976E9D7144664C300919346 /* ApacheProcess.cc */,
+				5976E9D8144664C300919346 /* ApacheProcess.h */,
+				5976E9D9144664C300919346 /* ApacheRequest.cc */,
+				5976E9DA144664C300919346 /* ApacheRequest.h */,
+				5976E9DB144664C300919346 /* ApacheServer.cc */,
+				5976E9DC144664C300919346 /* ApacheServer.h */,
+				5976E9DD144664C300919346 /* ApacheTable.cc */,
+				5976E9DE144664C300919346 /* ApacheTable.h */,
+				5976E9DF144664C300919346 /* INSTALL.md */,
+				5976E9E0144664C300919346 /* Makefile */,
+				5976E9E1144664C300919346 /* README.md */,
 				59C167C7132893D70089F4CE /* mod_node */,
 			);
 			sourceTree = "<group>";
@@ -38,7 +63,6 @@
 		59C167C7132893D70089F4CE /* mod_node */ = {
 			isa = PBXGroup;
 			children = (
-				59C167C8132893D70089F4CE /* apache.cc */,
 				59C167C9132893D70089F4CE /* conf */,
 				59C167CA132893D70089F4CE /* LICENSE */,
 				59C167CB132893D70089F4CE /* logs */,
@@ -260,6 +284,7 @@
 				59C167D6132895D30089F4CE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
