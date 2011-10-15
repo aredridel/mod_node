@@ -16,6 +16,12 @@ namespace mod_node {
 
     static void node_hook_child_init(apr_pool_t *p, server_rec *s);
 
+    /** Initialize the module when we get loaded by node.
+     *
+     * This is the second stage initialization: First, we hook Apache and 
+     * start node, then this gets called when node calls back when the 
+     * startup script requires its binding.
+     */
     void ApacheProcess::Initialize(Handle<Object> target) {
         using mod_node::process;
         using mod_node::queue;
@@ -42,7 +48,9 @@ namespace mod_node {
         ProcessFunc = Persistent<Function>::New(proc_function_template->GetFunction());
         Process = Persistent<Object>::New(ProcessFunc->NewInstance());
 
-        apr_queue_create(&queue, 1000, process->pool); // @todo handle error; @todo dynamically size queue (based on maxrequests?)
+        // @todo handle error
+        // @todo dynamically size queue (based on maxrequests?)
+        apr_queue_create(&queue, 1000, process->pool); 
         
         /* This will leave the event loop with one reference, which we 
            want since we want to last as long as Apache */
@@ -52,11 +60,20 @@ namespace mod_node {
         target->Set(String::New("process"), Process);
     }
 
+    /** Hook into Apache so we can initialize ourself.
+     *
+     * child_init hook is to start Node.
+     * handler hook is to pass requests to Node.
+     */
     void ApacheProcess::register_hooks(apr_pool_t *p) {
         ap_hook_child_init (node_hook_child_init, NULL,NULL, APR_HOOK_MIDDLE);
         ap_hook_handler(ApacheProcess::handler, NULL, NULL, APR_HOOK_MIDDLE);
     };
 
+    /** Handle a request from Apache, and pass to the node thread.
+     *
+     * Executes in Apache's thread.
+     */
     int ApacheProcess::handler(request_rec *r) {
         // Runs in the Apache thread
         using mod_node::queue;
@@ -83,9 +100,11 @@ namespace mod_node {
         return rc;
     }
 
-
+    /** Handle a request coming in from Apache.
+     *
+     * Executes in the Node thread.
+     */ 
     void ApacheProcess::RequestCallback(uv_async_t* handle, int status) {
-        // Executes in Node's thread
         using mod_node::queue;
         using mod_node::req_watcher;
 
@@ -110,21 +129,27 @@ namespace mod_node {
 
     };
 
+    /** Log a message to the Apache error log
+     */
     Handle<Value> ApacheProcess::Log(const Arguments &args) {
         if (args.Length() < 2 || !args[1]->IsString() || !args[0]->IsInt32()) {
             return THROW_BAD_ARGS;
         }
         String::Utf8Value val(args[1]->ToString());
-        ap_log_perror(APLOG_MARK, args[0]->ToInt32()->Value(), APR_SUCCESS, process->pool, "%s", *val);
+        ap_log_perror(APLOG_MARK, args[0]->ToInt32()->Value(), APR_SUCCESS,
+                process->pool, "%s", *val);
         return Undefined();
     };
 
+    /** Start a thread for node.
+     */
     static void node_hook_child_init(apr_pool_t *p, server_rec *s) {
         using mod_node::thread;
         using mod_node::process;
         ap_open_logs(p, p, p, s);
         mod_node::process = s->process;
-        apr_thread_create(&mod_node::thread, NULL, start_node, (void *)s, s->process->pool);
+        apr_thread_create(&mod_node::thread, NULL, start_node, (void *)s,
+                s->process->pool);
     };
 
 };
