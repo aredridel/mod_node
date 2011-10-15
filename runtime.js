@@ -28,6 +28,7 @@ apache.createServer(function(req) {
     req.write('Boo')
     req.end()
     apache.process.log(apache.APLOG_NOTICE, req.headers_in.Host)
+    apache.process.log(apache.APLOG_NOTICE, req.headers_in.isEmpty())
     console.log("req", req)
     console.log("this", this)
     console.log("args", arguments)

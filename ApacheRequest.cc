@@ -1,5 +1,5 @@
 #include "ApacheRequest.h"
-#include "ApacheTable.h"
+#include "APRTable.h"
 
 using namespace v8;
 
@@ -69,8 +69,8 @@ namespace mod_node {
     }
 
     ApacheRequest::ApacheRequest(request_ext *rex): rex(rex) {
-        HeadersIn = Persistent<Value>::New(ApacheTable::New(rex->req->headers_in));
-        HeadersOut = Persistent<Value>::New(ApacheTable::New(rex->req->headers_out));
+        HeadersIn = Persistent<Value>::New(APRTable::New(rex->req->headers_in));
+        HeadersOut = Persistent<Value>::New(APRTable::New(rex->req->headers_out));
     }
 
     ApacheRequest::~ApacheRequest() {
